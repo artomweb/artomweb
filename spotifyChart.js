@@ -54,20 +54,23 @@ function spotifyToggle() {
 }
 
 async function fetchSpotify() {
-    const response = await fetch("https://spreadsheets.google.com/feeds/list/1UYWe_3L4NiBU8_bwAbI1XTIRCToCDkOF44wUWVQ2gRE/1/public/full?alt=json");
+    const response = await fetch("https://spreadsheets.google.com/feeds/list/1HLUhT0UAgdinZsUAY4TtcKNPxLDw4NhPEBMEVEOOgmE/1/public/full?alt=json");
 
     const json = await response.json();
 
-    data = json.feed.entry.map((elt) => {
+    let jsonData = json.feed.entry.map((elt) => {
         return {
-            Date: new Date(elt.gsx$date.$t),
-            Value: elt.gsx$value.$t,
+            dateTime: new Date(elt.gsx$datetime.$t),
+            artist: elt.gsx$artist.$t,
+            song: elt.gsx$song.$t,
         };
     });
 
-    data = data.sort(function(a, b) {
-        return b.Date.getTime() - a.Date.getTime();
+    data = jsonData.sort(function(a, b) {
+        return b.dateTime.getTime() - a.dateTime.getTime();
     });
+
+    // console.log(data);
 
     spotifyChart();
     spotifyToggle();
@@ -144,8 +147,26 @@ fetchSpotify();
 //     }
 // }
 
+function aggregateByDay() {
+    console.time("timer");
+    let dataProc = _.chain(data)
+        .countBy((d) => moment(d.dateTime).format("dd"))
+        .map((count, day) => ({ day, count }))
+        .sortBy((d) => moment(d.day, "dd").isoWeekday())
+        .value();
+
+    console.log(dataProc);
+
+    let labels = dataProc.map((val) => val.day);
+    let avgs = dataProc.map((val) => val.count);
+
+    console.timeEnd("timer");
+
+    return { avgs, labels };
+}
+
 function updateByDay() {
-    const { avgs, labels } = aggregateByDay(data);
+    const { avgs, labels } = aggregateByDay();
 
     if (myChart.config.type == "line") {
         myChart.destroy();
@@ -185,30 +206,6 @@ function updateByDay() {
         //   console.log(myChart.data.datasets);
         myChart.update();
     }
-}
-
-function aggregateByDay(dat) {
-    let datN = dat.map((d) => {
-        let day = moment(d.Date).format("dd");
-        return { dofw: day, Date: d.Date, Value: +d.Value };
-    });
-
-    let totalAvgs = _.chain(datN)
-        .groupBy("dofw")
-        .map((entries, day) => ({
-            dofw: day,
-            avg: Math.round(_.meanBy(entries, (entry) => entry.Value)),
-        }))
-        .value();
-
-    totalAvgs = _.sortBy(totalAvgs, (o) => {
-        return moment(o.dofw, "dd").isoWeekday();
-    });
-
-    let labels = totalAvgs.map((val) => val.dofw);
-    let avgs = totalAvgs.map((val) => val.avg);
-
-    return { avgs, labels };
 }
 
 function aggregateByWeek(dat) {
