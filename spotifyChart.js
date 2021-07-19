@@ -6,25 +6,20 @@ let ctx2;
 let backgroundColor = "#81b29a";
 
 function switchDots() {
-    let circles = [
-        document.getElementById("circle0"),
-        document.getElementById("circle1"),
-        document.getElementById("circle2"),
-        // , document.getElementById("circle3")
-    ];
+    let circles = [document.getElementById("circle0"), document.getElementById("circle1"), document.getElementById("circle2"), document.getElementById("circle3")];
     let desc = document.getElementById("spotify-desc");
 
     switch (toggleState) {
         case 0:
-            desc.innerHTML = "On average, which days do I listen to the most music";
+            desc.innerHTML = "Which days do I listen to the most music";
             break;
-            // case 1:
-            //     desc.innerHTML = "On average, at which time of the day do I listen to the most music";
-            //     break;
         case 1:
-            desc.innerHTML = "How many songs have I listened to in the last two weeks";
+            desc.innerHTML = "At which time of the day do I listen to the most music";
             break;
         case 2:
+            desc.innerHTML = "How many songs have I listened to in the last two weeks";
+            break;
+        case 3:
             desc.innerHTML = "All data";
             break;
     }
@@ -38,19 +33,19 @@ function spotifyToggle() {
             updateByDay();
             break;
 
-            // case 1:
-            //     updateByTime();
-            //     break;
-
         case 1:
-            updateTwoWeeks(data);
+            updateByTime();
             break;
 
         case 2:
+            updateTwoWeeks();
+            break;
+
+        case 3:
             updateAllData();
             break;
     }
-    toggleState == 2 ? (toggleState = 0) : toggleState++;
+    toggleState == 3 ? (toggleState = 0) : toggleState++;
 }
 
 async function fetchSpotify() {
@@ -70,7 +65,7 @@ async function fetchSpotify() {
         return b.dateTime.getTime() - a.dateTime.getTime();
     });
 
-    // console.log(data);
+    console.log(JSON.stringify(data));
 
     spotifyChart();
     spotifyToggle();
@@ -78,89 +73,82 @@ async function fetchSpotify() {
 
 fetchSpotify();
 
-// function aggregateByHour(dat) {
-//     let datN = dat.map((d) => {
-//         let hour = moment(d.Date).format("HH");
-//         return { hofd: hour, Date: d.Date, Value: +d.Value };
-//     });
+function aggregateByHour() {
+    let hours = new Array(24).fill(0);
 
-//     console.log(datN);
+    let dataProc = _.chain(data)
+        .countBy((d) => moment(d.dateTime).format("HH"))
+        .map((count, hour) => ({ hour, count }))
+        .sortBy((d) => +d.hour)
+        .value();
 
-//     let totalAvgs = _.chain(datN)
-//         .groupBy("dofw")
-//         .map((entries, hour) => ({
-//             hofd: hour,
-//             avg: Math.round(_.meanBy(entries, (entry) => entry.Value)),
-//         }))
-//         .value();
+    dataProc.forEach((d) => {
+        hours[+d.hour] = d.count;
+    });
 
-//     totalAvgs = _.sortBy(totalAvgs, "hofd");
+    let finalData = _.map(hours, (count, hour) => {
+        return { hour, count };
+    });
 
-//     let labels = totalAvgs.map((val) => val.hofd);
-//     let avgs = totalAvgs.map((val) => val.avg);
+    console.log(finalData);
 
-//     return { avgs, labels };
-// }
+    // console.log(finalData);
 
-// function updateByTime() {
-//     const { avgs, labels } = aggregateByHour(data);
+    let labels = finalData.map((val) => val.hour);
+    let avgs = finalData.map((val) => val.count);
 
-//     // console.log(avgs);
+    return { avgs, labels };
+}
 
-//     if (myChart.config.type == "bar") {
-//         myChart.destroy();
-//         let temp = jQuery.extend(true, {}, config);
+function updateByTime() {
+    const { avgs, labels } = aggregateByHour(data);
 
-//         let minVal = _.min(avgs);
+    // console.log(avgs);
 
-//         temp.type = "line";
+    if (myChart.config.type == "bar") {
+        myChart.destroy();
+        let temp = jQuery.extend(true, {}, config);
 
-//         temp.data.labels = labels;
+        temp.type = "line";
 
-//         let newDataset = {
-//             // tension: 0.3,
-//             // borderColor: "black",
-//             data: avgs,
-//             backgroundColor,
-//             // fill: false,
-//         };
-//         temp.data.datasets = [newDataset];
-
-//         // temp.options.scales.yAxes[0] = { ticks: { min: minVal / 2 } };
-
-//         temp.options.scales.xAxes[0] = { offset: true };
-
-//         myChart = new Chart(ctx2, temp);
-//     } else {
-//         myChart.data.labels = labels;
-//         let newDataset = {
-//             // tension: 0.3,
-//             // borderColor: "black",
-//             data: avgs,
-//             backgroundColor,
-//             // fill: false,
-//         };
-//         myChart.data.datasets = [newDataset];
-//         myChart.options.scales = {};
-//         //   console.log(myChart.data.datasets);
-//         myChart.update();
-//     }
-// }
+        myChart = new Chart(ctx2, temp);
+    }
+    myChart.data.labels = labels;
+    let newDataset = {
+        data: avgs,
+        backgroundColor,
+    };
+    myChart.data.datasets = [newDataset];
+    // myChart.options.scales = {};
+    // myChart.options.scales.xAxes[0].ticks = {
+    //     beginAtZero: true,
+    //     autoSkip: true,
+    //     maxTicksLimit: 4,
+    //     maxRotation: 0,
+    //     minRotation: 0,
+    //     callback: function(value, index, values) {
+    //         if (+value < 12) {
+    //             return value + "AM";
+    //         } else {
+    //             return value + "PM";
+    //         }
+    //     },
+    // };
+    //   console.log(myChart.data.datasets);
+    myChart.update();
+}
 
 function aggregateByDay() {
-    console.time("timer");
     let dataProc = _.chain(data)
         .countBy((d) => moment(d.dateTime).format("dd"))
         .map((count, day) => ({ day, count }))
         .sortBy((d) => moment(d.day, "dd").isoWeekday())
         .value();
 
-    console.log(dataProc);
+    // console.log(dataProc);
 
     let labels = dataProc.map((val) => val.day);
     let avgs = dataProc.map((val) => val.count);
-
-    console.timeEnd("timer");
 
     return { avgs, labels };
 }
@@ -208,28 +196,27 @@ function updateByDay() {
     }
 }
 
-function aggregateByWeek(dat) {
+function aggregateByWeek() {
     // console.log(moment(dat[0].Date).format("YY-M"));
-    let weekAvg = _.chain(dat)
-        .groupBy((d) => {
-            return moment(d.Date).format("W-YYYY");
+    let weekAvg = _.chain(data)
+        .countBy((d) => {
+            return moment(d.dateTime).format("W-YYYY");
         })
-        .map((entries, week) => ({
-            wofy: week,
-            avg: _.sumBy(entries, (entry) => +entry.Value),
-        }))
+        .map((count, day) => ({ day, count }))
         .value();
 
-    weekAvg.sort((a, b) => moment(a.wofy, "W-YYYY") - moment(b.wofy, "W-YYYY"));
+    console.log(weekAvg);
 
-    let labels = weekAvg.map((w) => w.wofy);
-    let dataWeek = weekAvg.map((w) => w.avg);
+    weekAvg.sort((a, b) => moment(a.day, "W-YYYY") - moment(b.day, "W-YYYY"));
+
+    let labels = weekAvg.map((w) => w.day);
+    let dataWeek = weekAvg.map((w) => w.count);
 
     return { dataWeek, labels };
 }
 
 function updateAllData() {
-    let { dataWeek, labels } = aggregateByWeek(data);
+    let { dataWeek, labels } = aggregateByWeek();
     let newDataset = {
         // tension: 0.3,
         // borderColor: "black",
@@ -245,48 +232,32 @@ function updateAllData() {
 
         temp.type = "line";
 
-        temp.data.labels = labels;
-
-        // console.log(labels, dataWeek);
-
-        temp.data.datasets = [newDataset];
-
-        temp.options.scales = {
-            xAxes: [{
-                ticks: {
-                    autoSkip: true,
-                    maxTicksLimit: 4,
-                    maxRotation: 0,
-                    minRotation: 0,
-                },
-            }, ],
-        };
-    } else {
-        myChart.data.labels = labels;
-
-        // console.log(labels, dataWeek);
-
-        myChart.data.datasets = [newDataset];
-
-        myChart.options.scales = {
-            xAxes: [{
-                ticks: {
-                    autoSkip: true,
-                    maxTicksLimit: 4,
-                    maxRotation: 0,
-                    minRotation: 0,
-                },
-            }, ],
-        };
-
-        //   console.log(myChart.data.datasets);
-
-        myChart.update();
+        myChart = new Chart(ctx2, temp);
     }
+    myChart.data.labels = labels;
+
+    // console.log(labels, dataWeek);
+
+    myChart.data.datasets = [newDataset];
+
+    myChart.options.scales = {
+        xAxes: [{
+            ticks: {
+                autoSkip: true,
+                maxTicksLimit: 4,
+                maxRotation: 0,
+                minRotation: 0,
+            },
+        }, ],
+    };
+
+    //   console.log(myChart.data.datasets);
+
+    myChart.update();
 }
 
 function updateTwoWeeks() {
-    let { rawData, labels } = processData(data);
+    let { rawData, labels } = processData();
     rawData = rawData.slice(0, 14);
     labels = labels.slice(0, 14);
 
@@ -304,65 +275,49 @@ function updateTwoWeeks() {
 
         temp.type = "line";
 
-        temp.data.labels = labels;
-
-        temp.data.datasets = [newDataset];
-
-        temp.options.scales = {
-            xAxes: [{
-                type: "time",
-                time: {
-                    unit: "day",
-                    round: "day",
-                    displayFormats: {
-                        day: "dd",
-                    },
-                },
-            }, ],
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                },
-            }, ],
-        };
-
         myChart = new Chart(ctx2, temp);
-    } else {
-        myChart.data.labels = labels;
-
-        myChart.data.datasets = [newDataset];
-
-        myChart.options.scales = {
-            xAxes: [{
-                type: "time",
-                time: {
-                    unit: "day",
-                    round: "day",
-                    displayFormats: {
-                        day: "dd",
-                    },
-                },
-            }, ],
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true,
-                },
-            }, ],
-        };
-
-        //   console.log(myChart.data.datasets);
-
-        myChart.update();
     }
+
+    myChart.data.labels = labels;
+
+    myChart.data.datasets = [newDataset];
+
+    myChart.options.scales = {
+        xAxes: [{
+            type: "time",
+            time: {
+                unit: "day",
+                round: "day",
+                displayFormats: {
+                    day: "dd",
+                },
+            },
+        }, ],
+        yAxes: [{
+            ticks: {
+                beginAtZero: true,
+            },
+        }, ],
+    };
+    myChart.update();
 }
 
-function processData(dat) {
-    let labels = dat.map((e) => {
-        return new Date(e.Date);
+function processData() {
+    let dataProc = _.chain(data)
+        .countBy((d) => d.dateTime.toDateString())
+        .map((count, day) => ({ day, count }))
+        .sortBy((d) => new Date(d.day).getTime())
+        .reverse()
+        .value();
+
+    // console.log(dataProc);
+
+    let labels = dataProc.map((e) => {
+        return new Date(e.day);
     });
 
-    let rawData = dat.map((e) => {
-        return e.Value;
+    let rawData = dataProc.map((e) => {
+        return e.count;
     });
 
     return { rawData, labels };
