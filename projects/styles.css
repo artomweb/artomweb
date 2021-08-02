@@ -1,0 +1,90 @@
+@font-face {
+    font-family: "Klasik";
+    src: url("fonts/Klasik Regular.otf");
+}
+
+.title {
+    font-family: "Klasik";
+    /* font-family: Garamond; */
+    /* font-family: "Stardos Stencil", cursive; */
+    /* font-size: 6rem; */
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    font-size: calc(0.4em + 5.6vw);
+}
+
+body {
+    /* font-family: arial; */
+    margin: 0;
+    word-wrap: break-word;
+}
+
+::selection {
+    background: rgba(255, 255, 0, 0.3);
+}
+
+#butns {
+    /* padding-top: 2%; */
+    text-align: center;
+    margin: auto;
+}
+
+.button {
+    font-size: 1.5rem;
+    display: inline-block;
+    padding: 0.7em 1.4em;
+    margin: 0 0.3em 0.4em 0;
+    border-radius: 0.15em;
+    box-sizing: border-box;
+    font-family: "Roboto", sans-serif;
+    text-transform: uppercase;
+    font-weight: 400;
+    color: #ffffff;
+    box-shadow: inset 0 -0.6em 0 -0.35em rgba(0, 0, 0, 0.17);
+    text-align: center;
+    /* -webkit-transition: transform 0.25s ease-in-out; */
+    /* transition: transform 0.25s ease-in-out; */
+}
+
+.projects-button {
+    margin-bottom: 0;
+}
+
+.toggle-button {
+    font-size: 1rem;
+    background-color: #67a286;
+}
+
+
+/* .button:hover { 
+    top: 0.1em;
+    transform: translate(0, 0.375em);
+} */
+
+hr.dashed {
+    border-top: 2px dashed rgb(0, 0, 0);
+    background-color: transparent;
+}
+
+
+/* .fab {
+    padding: 20px;
+    font-size: 30px;
+    width: 50px;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+} */
+
+@media (max-width: 768px) {
+    .button {
+        font-size: 1rem;
+        /* padding: 0.5rem 1.2rem; */
+    }
+    /* .title {
+        font-size: 2.6rem;
+    } */
+    .toggle-button {
+        font-size: 0.8rem;
+    }
+}
