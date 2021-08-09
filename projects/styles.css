@@ -7,10 +7,10 @@
     font-family: "Klasik";
     /* font-family: Garamond; */
     /* font-family: "Stardos Stencil", cursive; */
-    /* font-size: 6rem; */
+    font-size: 6rem;
     margin-top: 0;
     margin-bottom: 0;
-    font-size: calc(0.4em + 5.6vw);
+    /* font-size: calc(0.4em + 5.6vw); */
 }
 
 body {

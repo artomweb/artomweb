@@ -19,7 +19,7 @@ body {
 }
 
 ::selection {
-    background: rgba(255, 255, 0, 0.3);
+    background: #9ee6fa;
 }
 
 #butns {

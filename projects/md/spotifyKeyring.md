@@ -5,13 +5,13 @@ header-includes: <meta name="keywords" content="Foo,Bar" />
   <meta name="description" content="My description" />
 ---
 
-![ ](/projects/images/keyring.jpg)
+![ ](/projects/images/keyring/keyring.jpg)
 
 The easiest way to understand Blender's Python commands is to open up the GUI into the Scripting workspace. Here, any modification made to Blender's UI is displayed in the console.
 
 For example when deleting the default cube, this is the output to the console:
 
-![ ](/projects/images/keyring3.png)
+![ ](/projects/images/keyring/keyring3.png)
 
 ### Clearing the workspace
 
@@ -45,7 +45,7 @@ bpy.ops.mesh.primitive_cylinder_add(radius=0.003, depth=0.005, location=(.04, -0
 
 This line was actually run like this:
 
-![](/projects/images/keyring4.jpg)
+![](/projects/images/keyring/keyring4.jpg)
 
 For the next step it will be useful to keep track of the cube and cylinder. You can't assign objects to variables when you create them, however as they are the only objects in the scene, we can reference them like this:
 
@@ -106,7 +106,7 @@ bpy.ops.import_curve.svg(filepath="SpotifyCodeDownload.svg", filter_glob="*.svg"
 
 ### Processing the SVG
 
-![](/projects/images/keyring5.png)
+![](/projects/images/keyring/keyring5.png)
 
 EEEK! The SVG is imported as hundreds of individual curves and there is no way around this.
 
@@ -138,7 +138,7 @@ bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
 
 The scene currently looks like this:
 
-![](/projects/images/keyring6.jpg)
+![](/projects/images/keyring/keyring6.jpg)
 
 So the last thing we need to do is move the SVG in the viewport and copy the output. The first two lines of this extract show an absolute rotation on the z axis.
 
@@ -179,6 +179,8 @@ And that's it, the program can be run with this command:
 ```shell
 blender -b --python BlenderStl.py
 ```
+
+![ ](/projects/images/keyring/keyring2.jpg)
 
 ## Full code
 

@@ -83,10 +83,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1 class="title">Generating Spotify keyrings with Python and Blender</h1>
 <p class="date">28/04/21</p>
 </header>
-<p><img src="/projects/images/keyring.jpg" /></p>
+<p><img src="/projects/images/keyring/keyring.jpg" /></p>
 <p>The easiest way to understand Blender’s Python commands is to open up the GUI into the Scripting workspace. Here, any modification made to Blender’s UI is displayed in the console.</p>
 <p>For example when deleting the default cube, this is the output to the console:</p>
-<p><img src="/projects/images/keyring3.png" /></p>
+<p><img src="/projects/images/keyring/keyring3.png" /></p>
 <h3 id="clearing-the-workspace">Clearing the workspace</h3>
 <p>The first thing you will want to do is delete everything in the default workspace. This makes sure that we are starting from a clean slate with no pesky default cube. Notice that we have to import Blender’s python module to be able to interact with Blender.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb1-1" title="1"><span class="im">import</span> bpy</a>
@@ -102,7 +102,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>I can also combine translating and scaling the object into the add function. If in any doubt the console will output the actual arguments that have been parsed when you run the script.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb3-1" title="1">bpy.ops.mesh.primitive_cylinder_add(radius<span class="op">=</span><span class="fl">0.003</span>, depth<span class="op">=</span><span class="fl">0.005</span>, location<span class="op">=</span>(.<span class="dv">04</span>, <span class="fl">-0.024</span>, <span class="dv">0</span>))</a></code></pre></div>
 <p>This line was actually run like this:</p>
-<p><img src="/projects/images/keyring4.jpg" /></p>
+<p><img src="/projects/images/keyring/keyring4.jpg" /></p>
 <p>For the next step it will be useful to keep track of the cube and cylinder. You can’t assign objects to variables when you create them, however as they are the only objects in the scene, we can reference them like this:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb4-1" title="1">cube <span class="op">=</span> bpy.data.objects[<span class="st">&#39;Cube&#39;</span>]</a>
 <a class="sourceLine" id="cb4-2" title="2">cylinder <span class="op">=</span> bpy.data.objects[<span class="st">&#39;Cylinder&#39;</span>]</a></code></pre></div>
@@ -137,7 +137,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Then we can import it into Blender:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb8-1" title="1">bpy.ops.import_curve.svg(filepath<span class="op">=</span><span class="st">&quot;SpotifyCodeDownload.svg&quot;</span>, filter_glob<span class="op">=</span><span class="st">&quot;*.svg&quot;</span>)</a></code></pre></div>
 <h3 id="processing-the-svg">Processing the SVG</h3>
-<p><img src="/projects/images/keyring5.png" /></p>
+<p><img src="/projects/images/keyring/keyring5.png" /></p>
 <p>EEEK! The SVG is imported as hundreds of individual curves and there is no way around this.</p>
 <p>First of all, the curve named ‘curve’ is a rectangle surrounding the code so we can delete that. Don’t forget to deselect everything before you start selecting.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb9-1" title="1">bpy.ops.<span class="bu">object</span>.select_all(action<span class="op">=</span><span class="st">&#39;DESELECT&#39;</span>)</a>
@@ -157,7 +157,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb10-10" title="10"></a>
 <a class="sourceLine" id="cb10-11" title="11">bpy.ops.<span class="bu">object</span>.origin_set(<span class="bu">type</span><span class="op">=</span><span class="st">&#39;ORIGIN_GEOMETRY&#39;</span>, center<span class="op">=</span><span class="st">&#39;MEDIAN&#39;</span>)</a></code></pre></div>
 <p>The scene currently looks like this:</p>
-<p><img src="/projects/images/keyring6.jpg" /></p>
+<p><img src="/projects/images/keyring/keyring6.jpg" /></p>
 <p>So the last thing we need to do is move the SVG in the viewport and copy the output. The first two lines of this extract show an absolute rotation on the z axis.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb11-1" title="1">curve <span class="op">=</span> bpy.data.objects[<span class="st">&quot;Curve.001&quot;</span>]</a>
 <a class="sourceLine" id="cb11-2" title="2"></a>
@@ -181,6 +181,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb13-2" title="2">bpy.ops.export_mesh.stl(filepath<span class="op">=</span><span class="st">&quot;out.stl&quot;</span>, use_selection<span class="op">=</span><span class="va">True</span>, global_scale<span class="op">=</span><span class="dv">1000</span>)</a></code></pre></div>
 <p>And that’s it, the program can be run with this command:</p>
 <pre class="shell"><code>blender -b --python BlenderStl.py</code></pre>
+<p><img src="/projects/images/keyring/keyring2.jpg" /></p>
 <h2 id="full-code">Full code</h2>
 <p>You can find all the code here:</p>
 <p><a href="https://github.com/artomweb/Spotify-Code-to-Stl" class="uri">https://github.com/artomweb/Spotify-Code-to-Stl</a></p>
